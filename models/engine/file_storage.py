@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import json
-
+from models.user import User
+from models.base_model import BaseModel
 
 class FileStorage:
     """
@@ -10,11 +11,26 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self):
+
+    classes = {
+    'BaseModel': BaseModel,
+    'User': User,
+    }
+
+    def all(sielf, cls=None):
         """
-        Returns the dictionary __objects.
+        Returns the dictionary with all objects of a specific class.
         """
-        return self.__objects
+        if cls:
+            if cls in self.classes:
+                objects = {k: v for k, v in self.__objects.items()
+                           if isinstance(v, self.classes[cls])}
+                return objects
+            else:
+                print("** class doesn't exist **")
+                return {}
+        else:
+            return self.__objects
 
     def new(self, obj):
         """
@@ -42,7 +58,8 @@ class FileStorage:
                 data = json.load(file)
                 for key, obj_dict in data.items():
                     class_name, obj_id = key.split(".")
-                    obj_class = models.classes[class_name]
-                    self.__objects[key] = obj_class(**obj_dict)
+                    obj_class = self.classes.get(class_name)
+                    if obj_class:
+                        self.__objects[key] = obj_class(**obj_dict)
         except FileNotFoundError:
             pass
