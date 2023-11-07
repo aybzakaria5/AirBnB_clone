@@ -36,7 +36,7 @@ class BaseModel:
                 kwargs["id"] = str(uuid.uuid4())
             if "created_at" in kwargs:
                 kwargs["created_at"] = datetime.strptime(kwargs["created_at"],
-                        "%Y-%m-%dT%H:%M:%S.%f")
+                                       "%Y-%m-%dT%H:%M:%S.%f")
             if "updated_at" in kwargs:
                 kwargs["updated_at"] = datetime.strptime(kwargs["updated_at"],
                         "%Y-%m-%dT%H:%M:%S.%f")
