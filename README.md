@@ -43,10 +43,6 @@ Here are some examples of how to use the AirBnB clone command interpreter:
 (hbnb) quit
 ```
 
-## Authors
-- Layla ABKARI
-- Ayoub Zakarya
-
 ## Repository Organization
 We use branches and pull requests on GitHub to facilitate collaboration and organization of our work.
 
