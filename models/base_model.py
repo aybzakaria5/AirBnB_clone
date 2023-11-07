@@ -5,7 +5,6 @@ This module defines the BaseModel class, which serves as the base class
 for other classes.
 """
 
-from models import storage
 import uuid
 from datetime import datetime
 

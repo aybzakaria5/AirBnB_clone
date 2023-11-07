@@ -134,10 +134,10 @@ daz5@DESKTOP-6PPFSAT:~/H/AirBnB_clone$ echo "show User 55b76419-6009-4b36-b88a-7
 ## Development environment 🛠️
 This project has been tested on Ubuntu 22.04 LTS
 
-* Programming language : Puthon 3
+* Programming language : Python 3
 * Development environment manager vagrant
 * Style guidelines: Google Style Python Docstrings
-* Python style guide checker  : PycodeStyle 
+* Python style guide checker  : PycodeStyle
 
 ## AUTHORS✒️
 ---
