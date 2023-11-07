@@ -3,7 +3,7 @@
 This script initializes a storage system for an application and loads existing
 data if available.
 """
-from engine.file_storage import FleStorage
+from models.engine.file_storage import FileStorage
 
 storage = FileStorage()
 storage.reload()
