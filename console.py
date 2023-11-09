@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ a consol to create and update objects"""
 import cmd
+from models import storage
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
@@ -8,7 +9,7 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
-from models.engine.file_storage import FileStorage
+
 
 class HBNBCommand(cmd.Cmd):
     """the consol class"""
@@ -16,12 +17,22 @@ class HBNBCommand(cmd.Cmd):
         "BaseModel": BaseModel,
         "User": User,
         "State": State,
-        "City": City,   
+        "City": City,
         "Amenity": Amenity,
         "Place": Place,
         "Review": Review
     }
     prompt = "(hbnb) "
+
+    def default(self, lines):
+        """the cmds's default methode to manipulate
+        commands with this form <class_name>.<methode>"""
+        line = lines.split('.')
+        if line[0] in self.class_mapping:
+            if line[1] == "all()":
+                self.do_all(line[0])
+            elif line[1] == "count()":
+                self.do_count([line[0]])
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
@@ -34,7 +45,6 @@ class HBNBCommand(cmd.Cmd):
     def do_EOF(self, arg):
         """handling ctrl+D"""
         return True
-
 
     def do_create(self, arg):
         """creates a new instance of a pecified class and prints its ID"""
@@ -49,7 +59,7 @@ class HBNBCommand(cmd.Cmd):
             print(obj.id)
         else:
             print("** class doesn't exist **")
-    
+
     def do_show(self, arg):
         """Prints the string representation of an instance
         based on the class name and ID"""
@@ -58,12 +68,12 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        
+
         class_name = args[0]
         if class_name not in HBNBCommand.class_mapping:
             print("** class dosen't exist **")
             return
-        
+
         if len(args) < 2:
             print("** instance id missing **")
             return
@@ -77,23 +87,33 @@ class HBNBCommand(cmd.Cmd):
         print(storage.all()[key])
 
     def do_all(self, arg):
-       """Prints all string representation of all
+        """Prints all string representation of all
        instances based or not on the class name."""
-       args = arg.split()
-       if not args:
-           objects = storage.all().values()
-       else:
-           class_name = args[0]
-           if class_name not in self.class_mapping:
-               print("** class doesn't exist **")
-               return
-           objects = [obj for obj in storage.all().values()
-                      if obj.__class__.__name__ == class_name]
-       formatted_objects = []
-       for obj in objects:
-           formatted_objects.append(f"[{str(obj)} {obj.to_dict()}]")
-       for formatted_obj in formatted_objects:
-           print(formatted_obj)
+        args = arg.split()
+        if not args:
+            objects = storage.all().values()
+        else:
+            class_name = args[0]
+            if class_name not in self.class_mapping:
+                print("** class doesn't exist **")
+                return
+            objects = [obj for obj in storage.all().values()
+                       if obj.__class__.__name__ == class_name]
+        formatted_objects = []
+        for obj in objects:
+            formatted_objects.append(f"[{str(obj)} {obj.to_dict()}]")
+        for formatted_obj in formatted_objects:
+            print(formatted_obj)
+
+    def do_count(self, arg):
+        """
+        Retrieves the number of instances of a class.
+        Usage: <class name>.count()
+        Example: User.count()
+        """
+        count = len([val for key, val in storage.all().items() if
+                     key.startswith(arg[0])])
+        print(count)
 
     def do_destroy(self, arg):
         """Deletes an instance based on the class
@@ -191,6 +211,7 @@ class HBNBCommand(cmd.Cmd):
 
         setattr(instance, attribute_name, value)
         instance.save()
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()

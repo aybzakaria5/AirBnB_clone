@@ -25,7 +25,7 @@ class FileStorage:
             'Amenity': Amenity,
             'Place': Place,
             'Review': Review
-            o}
+            }
 
     def all(self, cls=None):
         """

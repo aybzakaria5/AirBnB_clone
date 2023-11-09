@@ -30,6 +30,7 @@ class BaseModel:
             *args: Unused.
             **kwargs: Dictionary with attribute values.
         """
+        from . import storage
         tf = "%Y-%m-%dT%H:%M:%S.%f"
         if kwargs:
             if "id" not in kwargs:
@@ -61,6 +62,7 @@ class BaseModel:
                                      self.id, self.__dict__)
 
     def save(self):
+        from . import storage
         """Update the `updated_at` attribute with the current datetime."""
         self.updated_at = datetime.now()
         storage.save()
