@@ -33,6 +33,12 @@ class HBNBCommand(cmd.Cmd):
                 self.do_all(line[0])
             elif line[1] == "count()":
                 self.do_count([line[0]])
+            elif line[1].startswith("show"):
+                show_id = line[1].split('"')[1]
+                self.do_show(f"{line[0]} {show_id}")
+            elif line[1].startswith("destroy"):
+                destr_id = line[1].split('"')[1]
+                self.do_destroy(f"{line[0]} {destr_id}")
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
@@ -61,8 +67,8 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
 
     def do_show(self, arg):
-        """Prints the string representation of an instance
-        based on the class name and ID"""
+        """Prints the string representation of an
+        instance based on the class name and id."""
         args = arg.split()
 
         if not args:
@@ -70,8 +76,9 @@ class HBNBCommand(cmd.Cmd):
             return
 
         class_name = args[0]
+
         if class_name not in HBNBCommand.class_mapping:
-            print("** class dosen't exist **")
+            print("** class doesn't exist **")
             return
 
         if len(args) < 2:
@@ -84,6 +91,7 @@ class HBNBCommand(cmd.Cmd):
         if key not in storage.all():
             print("** no instance found **")
             return
+
         print(storage.all()[key])
 
     def do_all(self, arg):
