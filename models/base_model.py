@@ -30,15 +30,16 @@ class BaseModel:
             *args: Unused.
             **kwargs: Dictionary with attribute values.
         """
+        tf = "%Y-%m-%dT%H:%M:%S.%f"
         if kwargs:
             if "id" not in kwargs:
                 kwargs["id"] = str(uuid.uuid4())
             if "created_at" in kwargs:
                 kwargs["created_at"] = datetime.strptime(kwargs["created_at"],
-                                       "%Y-%m-%dT%H:%M:%S.%f")
+                                                         tf)
             if "updated_at" in kwargs:
                 kwargs["updated_at"] = datetime.strptime(kwargs["updated_at"],
-                        "%Y-%m-%dT%H:%M:%S.%f")
+                                                         tf)
             for key, value in kwargs.items():
                 if key != '__class__':
                     setattr(self, key, value)
