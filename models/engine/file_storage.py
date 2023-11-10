@@ -44,9 +44,9 @@ class FileStorage:
 
     def new(self, obj):
         """
-        Sets in __objects the obj with key <obj class name>.id.
+        Sets in __objects the obj with key <obj id>.
         """
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        key = obj.id
         self.__objects[key] = obj
 
     def save(self):
@@ -67,9 +67,9 @@ class FileStorage:
             with open(self.__file_path, "r", encoding="utf-8") as file:
                 data = json.load(file)
                 for key, obj_dict in data.items():
-                    class_name, obj_id = key.split(".")
-                    obj_class = self.classes.get(class_name)
+                    obj_id = key
+                    obj_class = self.classes.get(obj_dict['__class__'])
                     if obj_class:
-                        self.__objects[key] = obj_class(**obj_dict)
+                        self.__objects[obj_id] = obj_class(**obj_dict)
         except FileNotFoundError:
             pass
