@@ -26,22 +26,25 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, lines):
         """the cmds's default methode to manipulate
-        commands with this form <class_name>.<methode>
-        Args:
-            lines (_type_): input command object.methode()
-        """
+        commands with this form <class_name>.<methode>"""
         line = lines.split('.')
+        all_count = {
+            "all()": self.do_all,
+            "count()": self.do_count
+        }
+        # show_destroy = {
+        #     "show": self.do_show,
+        #     "destroy": self.do_destroy
+        # }
         if line[0] in self.class_mapping:
-            method_mapping = {
-                "all()": self.do_all,
-                "count()": self.do_count,
-                "show": self.do_show,
-                "destroy": self.do_destroy
-            }
-            method_name = line[1].split('"')[0]
-            if method_name in method_mapping:
-                method = method_mapping[method_name]
-                method(f"{line[0]} {line[1]}")
+            if line[1] in all_count:
+                all_count[line[1]](f"{line[0]} {line[1]}")
+            elif line[1].startswith("show"):
+                show_id = line[1].split('"')[1]
+                self.do_show(f"{line[0]} {show_id}")
+            elif line[1].startswith("destroy"):
+                destr_id = line[1].split('"')[1]
+                self.do_destroy(f"{line[0]} {destr_id}")
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
@@ -99,7 +102,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Prints all string representation of all
-       instances based or not on the class name."""
+        instances based or not on the class name."""
         args = arg.split()
         if not args:
             objects = storage.all().values()
