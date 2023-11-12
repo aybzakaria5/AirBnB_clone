@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-"""a unittest for the
-console module
+"""a unittest for theconsole module
 """
 import unittest
 from unittest.mock import patch
@@ -86,6 +85,15 @@ class TestHBNBCommand_methodes(unittest.TestCase):
             HBNBCommand().do_show("BaseModel 123")
             instance_str = output.getvalue().strip()
             self.assertEqual(instance_str, str(storage.all()["BaseModel.123"]))
+
+    def test_invalid_class_name(self):
+        """# When given an invalid class name
+        it should print an error message.
+        """
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_show("InvalidClass 123")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
 
 
 if __name__ == '__main__':
