@@ -74,7 +74,7 @@ class TestHBNBCommand_methodes(unittest.TestCase):
                 error_msg = output.getvalue().strip()
                 self.assertEqual(error_msg, "** class name missing **")
 
-    def test_valid_class_name_and_instance_id(self):
+    def test_show_valid_class_name_and_instance_id(self):
         """When given a valid class name and instance id, it should
         print the string representation of the instance."""
         base_model = BaseModel()
@@ -86,12 +86,30 @@ class TestHBNBCommand_methodes(unittest.TestCase):
             instance_str = output.getvalue().strip()
             self.assertEqual(instance_str, str(storage.all()["BaseModel.123"]))
 
-    def test_invalid_class_name(self):
+    def test_show_invalid_class_name(self):
         """# When given an invalid class name
         it should print an error message.
         """
         with patch("sys.stdout", new=StringIO()) as output:
             HBNBCommand().do_show("InvalidClass 123")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
+
+    def test_show_invalid_instance_id(self):
+        """# When given an invalid instance id
+        it should print an error message.
+        """
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_show("BaseModel InvalidID")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** no instance found **")
+
+    def test_show_invalid_class_name_and_instance_id(self):
+        """# When given an invalid class name and instance id
+        it should print an error message.
+        """
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_show("InvalidClass InvalidID")
             error_msg = output.getvalue().strip()
             self.assertEqual(error_msg, "** class doesn't exist **")
 
