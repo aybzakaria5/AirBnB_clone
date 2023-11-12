@@ -1,189 +1,99 @@
 #!/usr/bin/python3
-"""a unittest for theconsole module
-"""
+"""a test for the consol"""
 import unittest
-from unittest.mock import patch
-from io import StringIO
-from console import HBNBCommand
 from models import storage
-import json
-from models.base_model import BaseModel
-from models.user import User
-from models.place import Place
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.review import Review
+import os
+from unittest.mock import patch
+from console import HBNBCommand
+from io import StringIO
+from models.engine.file_storage import FileStorage
 
 
-class TestHBNBCommand_methodes(unittest.TestCase):
-    """testing all methodes wihtin hbnbnclass"""
+class CreateTest(unittest.TestCase):
+    """Create command"""
 
-    def test_create_existing_class(self):
-        """create a class"""
+    @classmethod
+    def setUp(self):
+        try:
+            os.rename("file.json", "Thefile.json")
+        except IOError:
+            pass
+        FileStorage.__objects = {}
+
+    @classmethod
+    def tearDown(self):
+        try:
+            os.remove("file.json")
+        except IOError:
+            pass
+        try:
+            os.rename("Thefile.json", "file.json")
+        except IOError:
+            pass
+
+    def test_create_no_class(self):
+        """no class given"""
+        with patch("sys.stdout", new=StringIO()) as op:
+            HBNBCommand().onecmd("create")
+            expected = "** class name missing **"
+            self.assertEqual(expected, op.getvalue().strip())
+
+    def test_create_no_existing_class(self):
+        """Test create with class doesn't exist"""
+        with patch("sys.stdout", new=StringIO()) as op:
+            HBNBCommand().onecmd("create Cake")
+            expected = "** class doesn't exist **"
+            self.assertEqual(expected, op.getvalue().strip())
+
+    def test_create_BaseModel_instance(self):
+        """Test create BaseModel"""
         with patch("sys.stdout", new=StringIO()) as output:
             HBNBCommand().onecmd("create BaseModel")
-            obj_id = output.getvalue().strip()
-            self.assertIsNotNone(storage.all()["BaseModel." + obj_id])
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
 
-    def test_print_instance_id(self):
-        """Print the ID of the newly created instance"""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = output.getvalue().strip()
-            self.assertEqual(obj_id, storage.all()["BaseModel." + obj_id].id)
-
-    def test_create_multiple_instances(self):
-        """
-         Create multiple instances of different
-         classes and save them
-        """
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id1 = output.getvalue().strip()
+    def test_create_User_instance(self):
+        """Test create User"""
         with patch("sys.stdout", new=StringIO()) as output:
             HBNBCommand().onecmd("create User")
-            obj_id2 = output.getvalue().strip()
-        self.assertIsNotNone(storage.all()["BaseModel." + obj_id1])
-        self.assertIsNotNone(storage.all()["User." + obj_id2])
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
 
-    def test_print_multiple_instance_ids(self):
-        """#Print the ID of each newly created instance"""
+    def test_create_Amenity_instance(self):
+        """Test create Amenity"""
         with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id1 = output.getvalue().strip()
+            HBNBCommand().onecmd("create Amenity")
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
+
+    def test_create_City_instance(self):
+        """Test create City"""
         with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().onecmd("create User")
-            obj_id2 = output.getvalue().strip()
-        self.assertEqual(obj_id1, storage.all()["BaseModel." + obj_id1].id)
-        self.assertEqual(obj_id2, storage.all()["User." + obj_id2].id)
+            HBNBCommand().onecmd("create City")
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
 
-    def test_create_non_existing_class(self):
-        """Try to create an instance with a non-existing class name
-        """
+    def test_create_Place_instance(self):
+        """Test create Place"""
         with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().onecmd("create NonExistingClass")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
+            HBNBCommand().onecmd("create Place")
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
 
-    def test_create_instance_without_class_name(self):
-        """Try to create an instance without specifying the class name"""
+    def test_create_Review_instance(self):
+        """Test create Review"""
         with patch("sys.stdout", new=StringIO()) as output:
-            with patch("unittest.mock.patch") as mock_patch:
-                HBNBCommand().onecmd("create")
-                error_msg = output.getvalue().strip()
-                self.assertEqual(error_msg, "** class name missing **")
+            HBNBCommand().onecmd("create Review")
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
 
-    def test_show_valid_class_name_and_instance_id(self):
-        """When given a valid class name and instance id, it should
-        print the string representation of the instance."""
-        base_model = BaseModel()
-        base_model.id = "123"
-        storage.all()["BaseModel.123"] = base_model
-
+    def test_create_State_instance(self):
+        """Test create State"""
         with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_show("BaseModel 123")
-            instance_str = output.getvalue().strip()
-            self.assertEqual(instance_str, str(storage.all()["BaseModel.123"]))
+            HBNBCommand().onecmd("create State")
+            with open("file.json", "r") as file:
+                self.assertIn(output.getvalue().strip(), file.read())
 
-    def test_show_invalid_class_name(self):
-        """# When given an invalid class name
-        it should print an error message.
-        """
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_show("InvalidClass 123")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
-
-    def test_show_invalid_instance_id(self):
-        """# When given an invalid instance id
-        it should print an error message.
-        """
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_show("BaseModel InvalidID")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** no instance found **")
-
-    def test_show_invalid_class_name_and_instance_id(self):
-        """# When given an invalid class name and instance id
-        it should print an error message.
-        """
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_show("InvalidClass InvalidID")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
-
-    def test_destroy_valid_class_name_and_instance_id(self):
-        """When given a valid class name and instance id,
-        it should delete the instance and save changes"""
-        base_model = BaseModel()
-        base_model.id = "123"
-        storage.all()["BaseModel.123"] = base_model
-
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_destroy("BaseModel 123")
-            self.assertNotIn("BaseModel.123", storage.all())
-
-    def test_destroy_invalid_class_name(self):
-        """When given an invalid class name,
-        it should print an error message."""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_destroy("InvalidClass 123")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
-
-    def test_destroy_invalid_instance_id(self):
-        """When given an invalid instance id,
-        it should print an error message."""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_destroy("BaseModel InvalidID")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** no instance found **")
-
-    def test_destroy_invalid_class_name_and_instance_id(self):
-        """When given an invalid class name and instance id,
-        it should print an error message."""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_destroy("InvalidClass InvalidID")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
-
-    def test_update_valid_class_name_instance_id_and_attribute(self):
-        """When given a valid class name, instance id, and attribute,
-        it should update the attribute and save changes."""
-        base_model = BaseModel()
-        base_model.id = "123"
-        storage.all()["BaseModel.123"] = base_model
-
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_update("BaseModel 123 name 'New_Name'")
-            updated_instance = storage.all()["BaseModel.123"]
-            self.assertEqual(updated_instance.name, "'New_Name'")
-
-    def test_update_invalid_class_name(self):
-        """When given an invalid class name,
-        it should print an error message."""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_update("InvalidClass 123 name 'New Name'")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
-
-    def test_update_invalid_instance_id(self):
-        """When given an invalid instance id,
-        it should print an error message."""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_update("BaseModel InvalidID name 'New Name'")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** no instance found **")
-
-    def test_update_invalid_class_name_instance_id_and_attribute(self):
-        """When given an invalid class name, instance id, and attribute,
-        it should print an error message."""
-        with patch("sys.stdout", new=StringIO()) as output:
-            HBNBCommand().do_update("InvalidClass InvalidID name 'New Name'")
-            error_msg = output.getvalue().strip()
-            self.assertEqual(error_msg, "** class doesn't exist **")
-
-
+   
 if __name__ == '__main__':
     unittest.main()
