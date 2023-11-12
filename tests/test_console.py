@@ -61,6 +61,22 @@ class TestHBNBCommand_methodes(unittest.TestCase):
         self.assertEqual(obj_id1, storage.all()["BaseModel." + obj_id1].id)
         self.assertEqual(obj_id2, storage.all()["User." + obj_id2].id)
 
+    def test_create_non_existing_class(self):
+        """Try to create an instance with a non-existing class name
+        """
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().onecmd("create NonExistingClass")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
+
+    def test_create_instance_without_class_name(self):
+        """Try to create an instance without specifying the class name"""
+        with patch("sys.stdout", new=StringIO()) as output:
+            with patch("unittest.mock.patch") as mock_patch:
+                HBNBCommand().onecmd("create")
+                error_msg = output.getvalue().strip()
+                self.assertEqual(error_msg, "** class name missing **")
+
 
 if __name__ == '__main__':
     unittest.main()
