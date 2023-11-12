@@ -2,136 +2,78 @@
 """a inittest for the consol module
 """
 import unittest
-from console import HBNBCommand
-from models import FileStorage
+from unittest.mock import patch, MagicMock
 from io import StringIO
-from unittest.mock import patch
+from console import HBNBCommand
+from models.base_model import BaseModel
 
 class TestHBNBCommand(unittest.TestCase):
-        # Deletes an instance based on the class name and id when no instance id is provided.
-    def test_destroy_BaseModel_no_instance_id(self):
-        '''
-        Test that do_destroy deletes an instance based on the class name and id
-        when no instance id is provided
-        '''
-        from unittest.mock import patch
-        from io import StringIO
-    
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("destroy BaseModel")
-            expected_output = "** instance id missing **"
-            self.assertEqual(expected_output, f.getvalue().strip())
-    
-        # Saves the change into the JSON file.
-    def test_destroy_BaseModel_save_change(self):
-        '''
-        Test that do_destroy saves the change into the JSON file
-        '''
-        storage = FileStorage()
-        storage.reload()
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel {obj_id}")
-            self.assertNotIn(obj_id, storage.all())
-    
-        # The test checks if the do_destroy method returns None.
-    def test_destroy_BaseModel_returns_none(self):
-        '''
-        Test that do_destroy returns None
-        '''
-        with patch("sys.stdout", new=StringIO()) as f:
-            result = HBNBCommand().onecmd("destroy BaseModel")
-            self.assertIsNone(result)
-    
 
-        # Test that do_destroy prints nothing.
-    def test_destroy_BaseModel_prints_nothing(self):
-        '''
-        Test that do_destroy prints nothing when no instance id given
-        '''
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("destroy BaseModel")
-            self.assertEqual("** instance id missing **", f.getvalue().strip())
-    
-        # Does not raise any exceptions.
-    def test_destroy_BaseModel_no_exceptions(self):
-        '''
-        Test that do_destroy does not raise any exceptions
-        '''
-        try:
-            HBNBCommand().onecmd("destroy BaseModel")
-        except Exception as e:
-            self.fail(f"do_destroy raised an exception: {e}")
-    
+    @patch('sys.stdout', new_callable=StringIO)
+    def assert_stdout(self, expected_output, mock_stdout, func, *args):
+        func(*args)
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
 
-        # If no arguments are passed, prints "** class name missing **".
-    def test_destroy_no_class_name_prints_class_name_missing(self):
-        '''
-        Test that do_destroy prints "** class name missing **" if no arguments are passed
-        '''
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("destroy")
-            expected_output = "** class name missing **"
-            self.assertEqual(expected_output, f.getvalue().strip())
-    
-        # If the class name does not exist, prints "** class doesn't exist **".
-    def test_destroy_invalid_class_name_prints_class_doesnt_exist(self):
-        '''
-        Test that do_destroy prints "** class doesn't exist **" if the class name does not exist
-        '''
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("destroy InvalidClass")
-            expected_output = "** class doesn't exist **"
-            self.assertEqual(expected_output, f.getvalue().strip())
-    
-    
-        # If the instance id is missing, prints "** instance id missing **".
-    def test_destroy_BaseModel_missing_instance_id_prints_instance_id_missing(self):
-        '''
-        Test that do_destroy prints "** instance id missing **" if the instance id is missing
-        '''
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("destroy BaseModel")
-            expected_output = "** instance id missing **"
-            self.assertEqual(expected_output, f.getvalue().strip())
-    
-        # If no instance is found, prints "** no instance found **".
-    def test_destroy_BaseModel_no_instance_found_prints_no_instance_found(self):
-        '''
-        Test that do_destroy prints "** no instance found **" if no instance is found
-        '''
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("destroy BaseModel 12345")
-            expected_output = "** no instance found **"
-            self.assertEqual(expected_output, f.getvalue().strip())
+    @patch('builtins.input', return_value='create BaseModel')
+    @patch('models.storage')
+    def test_create(self, mock_storage, mock_input):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assert_stdout('{}\n'.format(BaseModel().id), HBNBCommand().cmdloop)
+        mock_input.assert_called_once_with('(hbnb) ')
 
-        # If the instance is found, deletes it from the storage.
-    def test_destroy_BaseModel_instance_found_deletes_from_storage(self):
-        '''
-        Test that do_destroy deletes the instance from the storage if it is found
-        '''
-        storage = FileStorage()
-        storage.reload()
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel {obj_id}")
-            self.assertNotIn(obj_id, storage.all())
-    
-        # If the instance is found, saves the change into the JSON file.
-    def test_destroy_BaseModel_instance_found_saves_change(self):
-        '''
-        Test that do_destroy saves the change into the JSON file if the instance is found
-        '''
-        storage = FileStorage()
-        storage.reload()
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel {obj_id}")
-            storage.reload()
-            self.assertNotIn(obj_id, storage.all())
+    @patch('builtins.input', return_value='show BaseModel {}'.format(BaseModel().id))
+    @patch('models.storage')
+    def test_show(self, mock_storage, mock_input):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assert_stdout('{}\n'.format(repr(BaseModel())), HBNBCommand().cmdloop)
+        mock_input.assert_called_once_with('(hbnb) ')
 
-if __name__ == "__main__":
+    @patch('builtins.input', return_value='all')
+    @patch('models.storage')
+    def test_all(self, mock_storage, mock_input):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assert_stdout('[{}]'.format(repr(BaseModel())), HBNBCommand().cmdloop)
+        mock_input.assert_called_once_with('(hbnb) ')
+
+    @patch('builtins.input', return_value='count BaseModel')
+    @patch('models.storage')
+    def test_count(self, mock_storage, mock_input):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assert_stdout('1\n', HBNBCommand().cmdloop)
+        mock_input.assert_called_once_with('(hbnb) ')
+
+    @patch('builtins.input', return_value='destroy BaseModel {}'.format(BaseModel().id))
+    @patch('models.storage')
+    def test_destroy(self, mock_storage, mock_input):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assert_stdout('', HBNBCommand().cmdloop)
+        mock_input.assert_called_once_with('(hbnb) ')
+        mock_storage.all.return_value = {'BaseModel.{}'.format(BaseModel().id): MagicMock()}
+        mock_storage.save.assert_called_once()
+
+    @patch('builtins.input', return_value='update BaseModel {} name "new_name"'.format(BaseModel().id))
+    @patch('models.storage')
+    def test_update(self, mock_storage, mock_input):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assert_stdout('', HBNBCommand().cmdloop)
+        mock_input.assert_called_once_with('(hbnb) ')
+        mock_storage.all.return_value = {'BaseModel.{}'.format(BaseModel().id): MagicMock()}
+        mock_storage.save.assert_called_once()
+
+    def test_quit(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assertTrue(HBNBCommand().onecmd('quit'))
+            self.assertEqual(mock_stdout.getvalue(), '')
+
+    def test_emptyline(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            HBNBCommand().emptyline()
+            self.assertEqual(mock_stdout.getvalue(), '')
+
+    def test_do_EOF(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assertTrue(HBNBCommand().onecmd('EOF'))
+            self.assertEqual(mock_stdout.getvalue(), '')
+
+if __name__ == '__main__':
     unittest.main()
