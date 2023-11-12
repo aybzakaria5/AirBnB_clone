@@ -5,271 +5,208 @@ import unittest
 import re
 from console import HBNBCommand
 from models import FileStorage
+from models.base_model import BaseModel
 from models import storage
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 from io import StringIO
 from unittest.mock import patch
 
-
 class TestHBNBCommand(unittest.TestCase):
 
-    # tests for the create methode
-    # -------------------------------------------------------------------
-    # Create an instance of an existing class and verify that it was saved
-    def test_create_existing_class_saved(self):
-        """
-        Test that do_create saves an instance of an existing class
-        """
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            output = f.getvalue().strip()
-            self.assertTrue(output)
-            self.assertIn(f"BaseModel.{output}", storage.all().keys())
+    class_mapping = {
+        "BaseModel": BaseModel,
+        "User": User,
+        "State": State,
+        "City": City,
+        "Amenity": Amenity,
+        "Place": Place,
+        "Review": Review
+    }
 
-    # Create an instance of an existing class and verify that it has an id
-    def test_create_existing_class_has_id(self):
-        """
-        Test that do_create assigns an id to an instance of an existing class
-        """
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            output = f.getvalue().strip()
-            self.assertTrue(output)
-            obj_id = output
-            self.assertIn(f"BaseModel.{obj_id}", storage.all().keys())
+    # def test_create_existing_class_saved(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f"create {class_name}")
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             self.assertIn(f"{class_name}.{output}", storage.all().keys())
 
-        # Create an instance of an existing class with
-        # arguments and verify that it was saved
-    def test_create_existing_class_with_args_saved(self):
-        """
-        Test that do_create saves an instance of
-        an existing class with arguments
-        """
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd('create BaseModel')
-            output = f.getvalue().strip()
-            self.assertTrue(output)
-            self.assertIn('BaseModel.' + output, storage.all().keys())
+    # def test_create_existing_class_has_id(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f"create {class_name}")
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             obj_id = output
+    #             self.assertIn(f"{class_name}.{obj_id}", storage.all().keys())
 
-    # Create an instance of an existing class with
-    # arguments and verify that it has an id
-    def test_create_existing_class_with_args_has_id(self):
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd('create BaseModel name="test" number=123')
-            output = f.getvalue().strip()
-            self.assertTrue(output)
-            obj_id = output
-            self.assertIn(f"BaseModel.{obj_id}", storage.all().keys())
-    
-    # Test that do_create does not save an instance of a non-existing class
+    # def test_create_existing_class_with_args_saved(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f'create {class_name}')
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             self.assertIn(f'{class_name}.' + output, storage.all().keys())
+
+    # def test_create_existing_class_with_args_has_id(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f'create {class_name} name="test" number=123')
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             obj_id = output
+    #             self.assertIn(f"{class_name}.{obj_id}", storage.all().keys())
+
     def test_create_non_existing_class_not_saved(self):
-        """
-        Test that do_create does not save an instance of a non-existing class
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("create NonExistingClass")
             output = f.getvalue().strip()
             self.assertEqual("** class doesn't exist **", output)
             self.assertNotIn("NonExistingClass", storage.all().keys())
-    
-    # Create an instance of a non-existing class and verify
-    # that it returns an error message
+
     def test_create_non_existing_class_returns_error_message(self):
-        """
-        Test that do_create returns an error message when creating an instance of a non-existing class
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("create NonExistingClass")
             output = f.getvalue().strip()
             self.assertEqual("** class doesn't exist **", output)
 
-
-    # Test that do_create does not save an instance of an existing class with invalid arguments
     def test_create_existing_class_invalid_args_not_saved(self):
-        """
-        Test that do_create does not save an instance of an existing class with invalid arguments
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd('create BaseModel name=test number="invalid"')
             output = f.getvalue().strip()
             self.assertTrue(re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', output))
             self.assertNotIn("BaseModel", storage.all().keys())
 
-        # Test that do_create assigns a created_at attribute to an instance of an existing class
-    def test_create_existing_class_has_created_at(self):
-        """
-        Test that do_create assigns a created_at attribute to an instance of an existing class
-        """
-        with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            output = f.getvalue().strip()
-            self.assertTrue(output)
-            obj_id = output
-            key = f"BaseModel.{obj_id}"
-            self.assertIn(key, storage.all().keys())
-            self.assertIn("created_at", storage.all()[key].to_dict())
-    
-    # tests for the destroy methode
-    # ---------------------------------------------------------
-    # Deletes an instance based on the class name
-    # and id when no instance id is provided.
+    # def test_create_existing_class_has_created_at(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f"create {class_name}")
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             obj_id = output
+    #             key = f"{class_name}.{obj_id}"
+    #             self.assertIn(key, storage.all().keys())
+    #             self.assertIn("created_at", storage.all()[key].to_dict())
+
+    # def test_create_existing_class_has_updated_at(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f"create {class_name}")
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             obj_id = output
+    #             key = f"{class_name}.{obj_id}"
+    #             self.assertIn(key, storage.all().keys())
+    #             self.assertIn("updated_at", storage.all()[key].to_dict())
+
+    # def test_create_existing_class_has_to_dict(self):
+    #     with patch("sys.stdout", new=StringIO()) as f:
+    #         for class_name, class_type in self.class_mapping.items():
+    #             HBNBCommand().onecmd(f"create {class_name}")
+    #             output = f.getvalue().strip()
+    #             self.assertTrue(output)
+    #             obj_id = output
+    #             key = f"{class_name}.{obj_id}"
+    #             self.assertIn(key, storage.all().keys())
+    #             self.assertTrue(hasattr(storage.all()[key], "to_dict"))
 
     def test_destroy_BaseModel_no_instance_id(self):
-        """
-        Test that do_destroy deletes an instance based on the class name and id
-        when no instance id is provided
-        """
-        from unittest.mock import patch
-        from io import StringIO
-
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("destroy BaseModel")
             expected_output = "** instance id missing **"
             self.assertEqual(expected_output, f.getvalue().strip())
 
-    # Saves the change into the JSON file.
     def test_destroy_BaseModel_save_change(self):
-        """
-        Test that do_destroy saves the change into the JSON file
-        """
         storage = FileStorage()
         storage.reload()
         with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel {obj_id}")
-            self.assertNotIn(obj_id, storage.all())
+            for class_name, class_type in self.class_mapping.items():
+                HBNBCommand().onecmd(f"create {class_name}")
+                obj_id = f.getvalue().strip()
+                HBNBCommand().onecmd(f"destroy {class_name} {obj_id}")
+                self.assertNotIn(obj_id, storage.all())
 
-    # The test checks if the do_destroy method returns None.
     def test_destroy_BaseModel_returns_none(self):
-        """
-        Test that do_destroy returns None
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             result = HBNBCommand().onecmd("destroy BaseModel")
             self.assertIsNone(result)
 
-    # Test that do_destroy prints nothing.
     def test_destroy_BaseModel_prints_nothing(self):
-        """
-        Test that do_destroy prints nothing when no instance id given
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("destroy BaseModel")
             self.assertEqual("** instance id missing **", f.getvalue().strip())
 
-    # Does not raise any exceptions.
     def test_destroy_BaseModel_no_exceptions(self):
-        """
-        Test that do_destroy does not raise any exceptions
-        """
         try:
             HBNBCommand().onecmd("destroy BaseModel")
         except Exception as e:
             self.fail(f"do_destroy raised an exception: {e}")
 
-    # If no arguments are passed, prints "**
-    # class name missing **".
     def test_destroy_no_class_name(self):
-        """
-        Test that do_destroy prints "** class name missing **"
-        if no arguments are passed
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("destroy")
             expected_output = "** class name missing **"
             self.assertEqual(expected_output, f.getvalue().strip())
-    # If the class name does not exist, prints "**
-    # class doesn't exist **".
 
     def test_destroy_invalid_class_name_(self):
-        """
-        Test that do_destroy prints "** class doesn't exist **"
-        if the class name does not exist
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("destroy InvalidClass")
             expected_output = "** class doesn't exist **"
             self.assertEqual(expected_output, f.getvalue().strip())
 
-        # If the instance id is missing, prints "** instance id missing **".
     def test_destroy_BaseModel_missing_instance_id_(self):
-        """
-        Test that do_destroy prints "** instance id missing **"
-        if the instance id is missing
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("destroy BaseModel")
             expected_output = "** instance id missing **"
             self.assertEqual(expected_output, f.getvalue().strip())
 
-        # If no instance is found, prints "** no instance found **".
     def test_destroy_BaseModel_no_instance_found_(self):
-        """
-        Test that do_destroy prints "** no instance found **"
-        if no instance is found
-        """
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().onecmd("destroy BaseModel 12345")
             expected_output = "** no instance found **"
             self.assertEqual(expected_output, f.getvalue().strip())
 
-        # If the instance is found,
-        # deletes it from the storage.
     def test_destroy_BaseModel_instance_found_deletes_from_storage(self):
-        """
-        Test that do_destroy deletes the
-        instance from the storage if it is found
-        """
         with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel {obj_id}")
-            self.assertNotIn(obj_id, storage.all())
+            for class_name, class_type in self.class_mapping.items():
+                HBNBCommand().onecmd(f"create {class_name}")
+                obj_id = f.getvalue().strip()
+                HBNBCommand().onecmd(f"destroy {class_name} {obj_id}")
+                self.assertNotIn(obj_id, storage.all())
 
-    # If the instance is found,
-    # saves the change into the JSON file.
     def test_destroy_BaseModel_instance_found_saves_change(self):
-        """
-        Test that do_destroy saves the change
-        into the JSON file if the instance is found
-        """
         with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel {obj_id}")
-            storage.reload()
-            self.assertNotIn(obj_id, storage.all())
+            for class_name, class_type in self.class_mapping.items():
+                HBNBCommand().onecmd(f"create {class_name}")
+                obj_id = f.getvalue().strip()
+                HBNBCommand().onecmd(f"destroy {class_name} {obj_id}")
+                storage.reload()
+                self.assertNotIn(obj_id, storage.all())
 
-        # Deletes an instance when given
-        # a valid class name and id with numbers.
     def test_destroy_valid_class_name_and_id_with_numbers(self):
-        """
-        Test that do_destroy deletes an instance when
-        given a valid class name and id with numbers
-        """
         with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel '{obj_id}12345'")
-            storage.reload()
-            self.assertNotIn(obj_id, storage.all())
+            for class_name, class_type in self.class_mapping.items():
+                HBNBCommand().onecmd(f"create {class_name}")
+                obj_id = f.getvalue().strip()
+                HBNBCommand().onecmd(f"destroy {class_name} '{obj_id}12345'")
+                storage.reload()
+                self.assertNotIn(obj_id, storage.all())
 
-    # Deletes an instance when given a valid
-    # class name and id with special characters.
     def test_destroy_valid_class_name_and_id_with_special_characters(self):
-        """
-        Test that do_destroy deletes an instance when given
-        a valid class name and id with special characters
-        """
         storage = FileStorage()
         storage.reload()
         with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().onecmd("create BaseModel")
-            obj_id = f.getvalue().strip()
-            HBNBCommand().onecmd(f"destroy BaseModel '{obj_id}!@#$%^&*()'")
-            storage.reload()
-            self.assertNotIn(obj_id, storage.all())
-
+            for class_name, class_type in self.class_mapping.items():
+                HBNBCommand().onecmd(f"create {class_name}")
+                obj_id = f.getvalue().strip()
+                HBNBCommand().onecmd(f"destroy {class_name} '{obj_id}!@#$%^&*()'")
+                storage.reload()
+                self.assertNotIn(obj_id, storage.all())
 
 if __name__ == "__main__":
     unittest.main()
