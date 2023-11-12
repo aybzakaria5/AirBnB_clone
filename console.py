@@ -12,7 +12,7 @@ from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
-    """the consol class"""
+    """the console class"""
     class_mapping = {
         "BaseModel": BaseModel,
         "User": User,
@@ -28,17 +28,14 @@ class HBNBCommand(cmd.Cmd):
         return input(self.prompt)
 
     def default(self, lines):
-        """the cmds's default methode to manipulate
-        commands with this form <class_name>.<methode>"""
+        """the cmds's default method to manipulate
+        commands with this form <class_name>.<method>"""
         line = lines.split('.')
         all_count = {
             "all()": self.do_all,
             "count()": self.do_count
         }
-        # show_destroy = {
-        #     "show": self.do_show,
-        #     "destroy": self.do_destroy
-        # }
+
         if line[0] in self.class_mapping:
             if line[1] in all_count:
                 all_count[line[1]](f"{line[0]} {line[1]}")
@@ -54,17 +51,15 @@ class HBNBCommand(cmd.Cmd):
                 update_id = update_args[1]
                 update_attr = update_args[3]
                 update_value = update_args[5]
-                self.do_update(
-                    f"{update_class} {update_id}"
-                    f"{update_attr} {update_value}"
-                )
+                self.do_update(f"{update_class} {update_id}"
+                               f"{update_attr} {update_value}")
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
         return True
 
     def emptyline(self):
-        """handling ENTR+"""
+        """handling ENTER"""
         pass
 
     def do_EOF(self, arg):
@@ -72,7 +67,7 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_create(self, arg):
-        """creates a new instance of a pecified class and prints its ID"""
+        """creates a new instance of a specified class and prints its ID"""
         if not arg:
             print("** class name missing **")
             return
@@ -174,7 +169,7 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """
         Updates an instance based on the class name and id by adding
-        or updating attribute
+        or updating an attribute
         (save the change into the JSON file).
         """
         args = arg.split()

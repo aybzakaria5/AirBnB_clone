@@ -267,7 +267,7 @@ class TestHBNBCommand(unittest.TestCase):
         with patch("sys.stdout", new=StringIO()) as f:
             HBNBCommand().do_all("")
             output = f.getvalue().strip()
-        
+
             formatted_objects = []
             for obj in storage.all().values():
                 formatted_objects.append(f"[{str(obj)} {obj.to_dict()}]")
@@ -281,7 +281,7 @@ class TestHBNBCommand(unittest.TestCase):
         """
         from unittest.mock import patch
         from io import StringIO
-    
+
         with patch("sys.stdout", new=StringIO()) as f:
             with patch("unittest.mock.patch") as mock_patch:
                 mock_patch.return_value = f
@@ -289,9 +289,9 @@ class TestHBNBCommand(unittest.TestCase):
                 output = f.getvalue().strip()
 
                 formatted_objects = []
-                for obj in storage.all().values():
-                    if obj.__class__.__name__ == "BaseModel":
-                        formatted_objects.append(f"[{str(obj)} {obj.to_dict()}]")
+                for ob in storage.all().values():
+                    if ob.__class__.__name__ == "BaseModel":
+                        formatted_objects.append(f"[{str(ob)} {ob.to_dict()}]")
                 for formatted_obj in formatted_objects:
                     self.assertIn(formatted_obj, output)
 
