@@ -1,10 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """a unittest for the
 console module
 """
-
 import unittest
-
 from unittest.mock import patch
 from io import StringIO
 from console import HBNBCommand
@@ -76,6 +74,18 @@ class TestHBNBCommand_methodes(unittest.TestCase):
                 HBNBCommand().onecmd("create")
                 error_msg = output.getvalue().strip()
                 self.assertEqual(error_msg, "** class name missing **")
+
+    def test_valid_class_name_and_instance_id(self):
+        """When given a valid class name and instance id, it should
+        print the string representation of the instance."""
+        base_model = BaseModel()
+        base_model.id = "123"
+        storage.all()["BaseModel.123"] = base_model
+
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_show("BaseModel 123")
+            instance_str = output.getvalue().strip()
+            self.assertEqual(instance_str, str(storage.all()["BaseModel.123"]))
 
 
 if __name__ == '__main__':
