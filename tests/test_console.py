@@ -113,6 +113,77 @@ class TestHBNBCommand_methodes(unittest.TestCase):
             error_msg = output.getvalue().strip()
             self.assertEqual(error_msg, "** class doesn't exist **")
 
+    def test_destroy_valid_class_name_and_instance_id(self):
+        """When given a valid class name and instance id,
+        it should delete the instance and save changes"""
+        base_model = BaseModel()
+        base_model.id = "123"
+        storage.all()["BaseModel.123"] = base_model
+
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_destroy("BaseModel 123")
+            self.assertNotIn("BaseModel.123", storage.all())
+
+    def test_destroy_invalid_class_name(self):
+        """When given an invalid class name,
+        it should print an error message."""
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_destroy("InvalidClass 123")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
+
+    def test_destroy_invalid_instance_id(self):
+        """When given an invalid instance id,
+        it should print an error message."""
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_destroy("BaseModel InvalidID")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** no instance found **")
+
+    def test_destroy_invalid_class_name_and_instance_id(self):
+        """When given an invalid class name and instance id,
+        it should print an error message."""
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_destroy("InvalidClass InvalidID")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
+
+    def test_update_valid_class_name_instance_id_and_attribute(self):
+        """When given a valid class name, instance id, and attribute,
+        it should update the attribute and save changes."""
+        base_model = BaseModel()
+        base_model.id = "123"
+        storage.all()["BaseModel.123"] = base_model
+
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_update("BaseModel 123 name 'New_Name'")
+            updated_instance = storage.all()["BaseModel.123"]
+            self.assertEqual(updated_instance.name, "'New_Name'")
+
+    def test_update_invalid_class_name(self):
+        """When given an invalid class name,
+        it should print an error message."""
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_update("InvalidClass 123 name 'New Name'")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
+
+    def test_update_invalid_instance_id(self):
+        """When given an invalid instance id,
+        it should print an error message."""
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_update("BaseModel InvalidID name 'New Name'")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** no instance found **")
+
+    def test_update_invalid_class_name_instance_id_and_attribute(self):
+        """When given an invalid class name, instance id, and attribute,
+        it should print an error message."""
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().do_update("InvalidClass InvalidID name 'New Name'")
+            error_msg = output.getvalue().strip()
+            self.assertEqual(error_msg, "** class doesn't exist **")
+
 
 if __name__ == '__main__':
     unittest.main()
