@@ -24,6 +24,9 @@ class HBNBCommand(cmd.Cmd):
     }
     prompt = "(hbnb) "
 
+    def readline(self):
+        return input(self.prompt)
+
     def default(self, lines):
         """the cmds's default methode to manipulate
         commands with this form <class_name>.<methode>"""
@@ -45,6 +48,16 @@ class HBNBCommand(cmd.Cmd):
             elif line[1].startswith("destroy"):
                 destr_id = line[1].split('"')[1]
                 self.do_destroy(f"{line[0]} {destr_id}")
+            elif line[1].startswith("update"):
+                update_args = line[1].split('"')
+                update_class = line[0]
+                update_id = update_args[1]
+                update_attr = update_args[3]
+                update_value = update_args[5]
+                self.do_update(
+                    f"{update_class} {update_id}"
+                    f"{update_attr} {update_value}"
+                )
 
     def do_quit(self, arg):
         """Quit command to exit the program"""
