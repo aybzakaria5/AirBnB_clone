@@ -36,6 +36,29 @@ class TestHBNBCommand(unittest.TestCase):
             obj_id = output
             self.assertIn(f"BaseModel.{obj_id}", storage.all().keys())
 
+        # Create an instance of an existing class with
+        # arguments and verify that it was saved
+    def test_create_existing_class_with_args_saved(self):
+        '''
+        Test that do_create saves an instance of
+        an existing class with arguments
+        '''
+        with patch("sys.stdout", new=StringIO()) as f:
+            HBNBCommand().onecmd('create BaseModel')
+            output = f.getvalue().strip()
+            self.assertTrue(output)
+            self.assertIn('BaseModel.' + output, storage.all().keys())
+
+    # Create an instance of an existing class with
+    # arguments and verify that it has an id
+    def test_create_existing_class_with_args_has_id(self):
+        with patch("sys.stdout", new=StringIO()) as f:
+            HBNBCommand().onecmd('create BaseModel name="test" number=123')
+            output = f.getvalue().strip()
+            self.assertTrue(output)
+            obj_id = output
+            self.assertIn(f"BaseModel.{obj_id}", storage.all().keys())
+
     # tests for the destroy methode
     # ---------------------------------------------------------
     # Deletes an instance based on the class name
