@@ -295,6 +295,13 @@ class TestHBNBCommand(unittest.TestCase):
                 for formatted_obj in formatted_objects:
                     self.assertIn(formatted_obj, output)
 
+    def test_calls_do_all(self):
+        """calls do_all method if 'class.all()' is in the command
+        """
+        with patch("sys.stdout", new=StringIO()) as f:
+            HBNBCommand().default("BaseModel.all()")
+            self.assertIn("[BaseModel", f.getvalue().strip())
+
 
 if __name__ == "__main__":
     unittest.main()
