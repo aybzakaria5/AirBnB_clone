@@ -299,7 +299,7 @@ class TestHBNBCommand(unittest.TestCase):
         """calls do_all method if 'class.all()' is in the command
         """
         with patch("sys.stdout", new=StringIO()) as f:
-            HBNBCommand().default("BaseModel.all()")
+            HBNBCommand().onecmd("BaseModel.all()")
             self.assertIn("[BaseModel", f.getvalue().strip())
 
 
