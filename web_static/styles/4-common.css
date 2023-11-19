@@ -7,5 +7,9 @@ body {
 }
 .container {
     max-width: 1000px;
+    /* Top margin: 30 pixels
+    Right margin: Auto (calculated by the browser)
+    Bottom margin: 30 pixels
+    Left margin: Auto (calculated by the browser) */
     margin: 30px auto;
 }
