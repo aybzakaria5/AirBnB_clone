@@ -4,6 +4,7 @@ header {
     width: 100%;
     border-bottom: 1px solid #CCCCCC;
 }
+/* setting the logo as a div */
  .logo {
     background-image: url("/images/logo.png");
     background-repeat: no-repeat;
