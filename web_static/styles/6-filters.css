@@ -1,0 +1,91 @@
+.container section.filters {
+    display: flex;
+    color: #FFFFFF;
+    height: 70px;
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+  }
+  
+  .locations {
+    height: 100%;
+    width: 50%;
+    color: #000000;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .amenities {
+    height: 100%;
+    width: 50%;
+    color: #000000;
+    display: flex;
+    flex-direction: column;
+    border-left: solid 1px #DDDDDD;
+    padding-left: 0px;
+    padding-right: 250px;
+  }
+  
+  .Button-Search {
+    font-size: 18px;
+    background-color: #FF5A5F;
+    color: #FFFFFF;
+    height: 48px;
+    width: 30%;
+    border-radius: 4px;
+    border: 0px;
+    margin-right: 30px;
+    margin-top: 10px;  
+}
+  
+  button:hover {
+    opacity: 0.9;
+  }
+  
+  div .locations h3, 
+  div .amenities h3 {
+    font-weight: 600;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+  }
+  
+  div .locations h4, 
+  div .amenities h4 {
+    font-weight: 400;
+    font-size: 14px;
+    padding-top: 0px;
+    margin-top: 0px;
+  }
+  
+  .popover {
+    display: none;
+    list-style-type: none;
+    background-color: #FAFAFA;
+    border: 1px #DDDDDD solid;
+    border-radius: 4px;
+    /* i made the margin-top so it can show with a space  */
+    margin-top: 10px;
+  }
+  
+  .popover h2 {
+    font-size: 16px;
+    margin-bottom: 1px;
+  }
+  .popover h4 {
+    padding-left: 10px;
+  }
+  .popover p {
+    padding-left: 20px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    padding-bottom: 1px;
+  }
+  .amenities:hover .popover, .locations:hover .popover {
+    display: block;
+  }
+  
+  .filter-header {
+    margin-left: 30px;
+  }
+  
+  
