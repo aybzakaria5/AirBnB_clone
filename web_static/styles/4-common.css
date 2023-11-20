@@ -11,5 +11,7 @@ body {
     Right margin: Auto (calculated by the browser)
     Bottom margin: 30 pixels
     Left margin: Auto (calculated by the browser) */
+    /* padding-left: 300px;
+    padding-right: 300px; */
     margin: 30px auto;
 }
