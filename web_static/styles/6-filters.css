@@ -41,7 +41,11 @@
   button:hover {
     opacity: 0.9;
   }
-  
+  /* button:active{
+    background-color: yellow;
+    opacity: 90%;
+    cursor: crosshair;
+  } */
   div .locations h3, 
   div .amenities h3 {
     font-weight: 600;
